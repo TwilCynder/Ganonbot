@@ -10,7 +10,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Events, Collection, GatewayIntentBits } = require('discord.js');
-const { token, clientID } = require('./config.json');
+const { clientID } = require('./config.json');
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
@@ -78,6 +78,24 @@ client.once(Events.ClientReady, c => {
 	console.log('Okay ! Je suis prêt !');
 });
 // Connexion
+
+let token;
+try {
+    let res = fs.readFileSync("./token.json");
+    res = JSON.parse(res);
+    if (!res && !res.token) throw "Could not find a token property in token.json";
+    token = res.token;
+} catch (err) {
+    if (err instanceof SyntaxError){
+        console.error("token.json coudn't be parsed, its syntax is incorrect : ", err);
+    } else if (typeof err == "string") {
+        console.error("Error reading token in token.json :", err);
+    } else {
+        console.error("Cannot read token.json. If it doesn't exist, please create a token.json file containing  {\"token\" : BOT_TOKEN} ");
+    }
+    process.exit(1);
+}
+
 client.login(token);
 
 // Réaction aux évènements
